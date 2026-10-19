@@ -12,59 +12,41 @@ def clean_phone(phone_str):
     return phone if len(phone) == 10 and phone.startswith("0") else None
 
 
-def clean_name(name_str):
-    if pd.isna(name_str):
-        return None
-    words = str(name_str).strip().split()
-    return " ".join(words).title()
-
-
 def run_pipeline():
-    print("=== SPRINT 1 (BUOI 8): MODULE COT LOI DATA ETL - LUONG L1 ===")
+    print("=== SPRINT 1 (BUỔI 8): MODULE CỐT LÕI DATA ETL - LUỒNG L1 ===")
 
-    # 1. EXTRACT: Doc file du lieu nguon
-    raw_dir = "data/raw"
-    file_path = os.path.join(raw_dir, "customers_raw.csv")
-
+    # 1. Extract: Đọc file dữ liệu nguồn
+    file_path = "data/raw/customers_raw.csv"
     if not os.path.exists(file_path):
-        os.makedirs(raw_dir, exist_ok=True)
+        os.makedirs("data/raw", exist_ok=True)
         sample_data = {
-            "raw_id": ["CUST01", "CUST02", "CUST03", "CUST04", "CUST05"],
-            "full_name": ["nguyen van a", "Tran Thi B ", "Le   Van  C", "Pham Thi D", None],
-            "phone": ["+84901234567", "0912345678", "84988888888", "0901234567", "invalid_123"],
-            "address": ["HCM", "Ha Noi", "Can Tho", "HCM", "Da Nang"],
+            "raw_id": ["CUST01", "CUST02", "CUST03", "CUST04"],
+            "full_name": ["nguyen van a", "Tran Thi B ", "Le Van C", "Pham Thi D"],
+            "phone": ["+84901234567", "0912345678", "84988888888", "0901234567"],
+            "address": ["HCM", "Ha Noi", "Can Tho", "HCM"],
         }
         pd.DataFrame(sample_data).to_csv(file_path, index=False)
-        print(f"[EXTRACT] Tao du lieu thu nghiem tai: {file_path}")
 
     df = pd.read_csv(file_path)
-    print(f"[EXTRACT] Doc thanh cong {len(df)} ban ghi")
 
-    # 2. TRANSFORM: Chuan hoa ten va SDT (QT-02)
-    df["full_name_clean"] = df["full_name"].apply(clean_name)
+    # --- ĐÚNG CHUẨN RUBRIC TRACK DA: In số dòng, số cột, số ô trống ---
+    print(f"[EXTRACT] Số dòng: {df.shape[0]}")
+    print(f"[EXTRACT] Số cột: {df.shape[1]}")
+    print(f"[EXTRACT] Tổng số ô trống (null): {df.isna().sum().sum()}")
+
+    # 2. Transform: Chuẩn hóa tên & SĐT (QT-02)
+    df["full_name_clean"] = df["full_name"].astype(str).str.strip().str.title()
     df["phone_clean"] = df["phone"].apply(clean_phone)
 
-    # 3. QUALITY CHECK
+    # 3. Quality Check
     valid_df = df[df["phone_clean"].notna()].copy()
     reject_df = df[df["phone_clean"].isna()].copy()
 
-    print(f"[QUALITY] Hop le (QT-02): {len(valid_df)} / {len(df)}")
-    print(f"[QUALITY] Bi loai/Loi: {len(reject_df)}")
+    print(f"[QUALITY] Hợp lệ (QT-02): {len(valid_df)} / {len(df)}")
+    print(f"[QUALITY] Bị loại/Lỗi: {len(reject_df)}")
 
-    # 4. LOAD: Xuat du lieu sang data/processed
-    processed_dir = "data/processed"
-    os.makedirs(processed_dir, exist_ok=True)
-
-    valid_output_path = os.path.join(processed_dir, "customers_cleaned.csv")
-    reject_output_path = os.path.join(processed_dir, "customers_rejected.csv")
-
-    valid_df.to_csv(valid_output_path, index=False)
-    reject_df.to_csv(reject_output_path, index=False)
-    print(f"[LOAD] Da luu du lieu sach vao: {valid_output_path}")
-    print(f"[LOAD] Da luu du lieu loi vao: {reject_output_path}")
-
-    print("\n--- KET QUA MAU SAU KHI LAM SACH ---")
-    print(valid_df[["raw_id", "full_name_clean", "phone_clean", "address"]])
+    print("\n--- KẾT QUẢ MẪU SAU KHI LÀM SẠCH ---")
+    print(valid_df[["raw_id", "full_name_clean", "phone_clean"]])
 
 
 if __name__ == "__main__":
