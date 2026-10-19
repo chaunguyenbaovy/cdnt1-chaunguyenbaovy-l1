@@ -1,0 +1,54 @@
+<mxfile host="app.diagrams.net" modified="2026-10-19T00:00:00.000Z" agent="GeminiNotebook" version="21.0.0" type="device">
+  <diagram id="uc_l1_diag" name="Use Case Diagram">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <!-- Title -->
+        <mxCell id="uctitle" value="SƠ ĐỒ USE CASE DIAGRAM (SMART CRM - LUỒNG L1)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#1A365D;" vertex="1" parent="1">
+          <mxGeometry x="180" y="20" width="800" height="40" as="geometry" />
+        </mxCell>
+        <!-- Boundary -->
+        <mxCell id="bound" value="System Boundary: Smart CRM System (Mekong Mobile - Luồng L1)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#2B6CB0;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="220" y="80" width="720" height="600" as="geometry" />
+        </mxCell>
+        <!-- Use Cases inside boundary -->
+        <mxCell id="uc1" value="UC1: Tra cứu SĐT&#10;(Lookup Profile)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2B6CB0;fontStyle=1;" vertex="1" parent="bound">
+          <mxGeometry x="80" y="60" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="uc2" value="UC2: Tạo/Cập nhật hồ sơ&#10;(Create/Update Profile)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2B6CB0;fontStyle=1;" vertex="1" parent="bound">
+          <mxGeometry x="80" y="220" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="uc3" value="UC3: Gộp hồ sơ trùng&#10;(Deduplicate - V1)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEFCBF;strokeColor=#D69E2E;fontStyle=1;" vertex="1" parent="bound">
+          <mxGeometry x="80" y="380" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="uc4" value="UC4: Quy tắc phân khúc&#10;(Config Segment Rule - QT-12)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2B6CB0;fontStyle=1;" vertex="1" parent="bound">
+          <mxGeometry x="440" y="220" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="uc5" value="UC5: Lọc &amp; Xuất danh sách&#10;(Filter &amp; Export List - V5)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E6FFFA;strokeColor=#319795;fontStyle=1;" vertex="1" parent="bound">
+          <mxGeometry x="440" y="380" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="uc6" value="UC6: Xem báo cáo phân khúc&#10;(View Segment Report)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2B6CB0;fontStyle=1;" vertex="1" parent="bound">
+          <mxGeometry x="440" y="60" width="220" height="80" as="geometry" />
+        </mxCell>
+        <!-- Actors outside -->
+        <mxCell id="act_sales" value="Nhân viên Bán hàng&#10;(Sales Staff)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#EBF8FF;strokeColor=#3182CE;" vertex="1" parent="1">
+          <mxGeometry x="80" y="200" width="50" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="act_mkt" value="Nhân viên Marketing&#10;(Marketing Staff)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#FEFCBF;strokeColor=#D69E2E;" vertex="1" parent="1">
+          <mxGeometry x="80" y="440" width="50" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="act_mgr" value="Quản lý Cửa hàng&#10;(Store Manager)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#E6FFFA;strokeColor=#319795;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="200" width="50" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="act_sys" value="&lt;&lt;System / Timer&gt;&gt;&#10;Job tự động hằng tháng" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fillColor=#EDF2F7;strokeColor=#718096;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="980" y="440" width="140" height="80" as="geometry" />
+        </mxCell>
+        <!-- Legend Box -->
+        <mxCell id="leg" value="CHÚ THÍCH KÝ HIỆU (LEGEND):&#10;• Actor: Vai trò người dùng / System Timer  |  • UC (Ellipse): Chức năng  |  • &lt;&lt;include&gt;&gt;: Bắt buộc  |  • &lt;&lt;extend&gt;&gt;: Mở rộng&#10;TRUY VẾT VẤN ĐỀ &amp; QUY TẮC: V1 (Trùng 18-22% SĐT), V5 (Lãng phí tiếp thị), QT-01 (SĐT duy nhất), QT-02 (Regex 10 số), QT-12 (VIP/REG), QT-13 (Soft delete), QT-15 (Mask SĐT)." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDF2F7;strokeColor=#CBD5E0;fontColor=#2D3748;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="80" y="700" width="1000" height="50" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
