@@ -1,0 +1,5 @@
+raw_id,full_name,phone,address,full_name_clean,phone_clean
+CUST01,nguyen van a,+84901234567,HCM,Nguyen Van A,0901234567
+CUST02,Tran Thi B ,0912345678,Ha Noi,Tran Thi B,0912345678
+CUST03,Le   Van  C,84988888888,Can Tho,Le Van C,0988888888
+CUST04,Pham Thi D,0901234567,HCM,Pham Thi D,0901234567
