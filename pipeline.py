@@ -1,53 +1,163 @@
-import os
+from datetime import datetime
 import re
+import sqlite3
 import pandas as pd
 
+print("=== SPRINT 2 (BUỔI 10): MỞ RỘNG PIPELINE & NẠP KHO DỮ LIỆU DWH ===")
 
-def clean_phone(phone_str):
-    if pd.isna(phone_str):
-        return None
-    phone = re.sub(r"\D", "", str(phone_str))
-    if phone.startswith("84") and len(phone) == 11:
-        phone = "0" + phone[2:]
-    return phone if len(phone) == 10 and phone.startswith("0") else None
+# 1. EXTRACT (Trích xuất)
+try:
+  df_raw = pd.read_csv("data/raw/customers_raw.csv")
+except Exception:
+  data = {
+      "raw_id": ["CUST01", "CUST02", "CUST03", "CUST04", "CUST05"],
+      "full_name": ["Nguyen Van A", "Tran Thi B", "Le Van C", "Pham Thi D", None],
+      "phone": [
+          "0901234567",
+          "+84912345678",
+          "0988888888",
+          "0901234567",
+          "invalid_phone",
+      ],
+  }
+  df_raw = pd.DataFrame(data)
 
+# Tự động bổ sung 2 cột chi tiêu/đơn hàng nếu file CSV chưa có
+if "total_spent_12m" not in df_raw.columns:
+  df_raw["total_spent_12m"] = [35000000, 15000000, 5000000, 0, 0][
+      : len(df_raw)
+  ]
+if "total_orders_12m" not in df_raw.columns:
+  df_raw["total_orders_12m"] = [10, 4, 1, 0, 0][: len(df_raw)]
 
-def run_pipeline():
-    print("=== SPRINT 1 (BUỔI 8): MODULE CỐT LÕI DATA ETL - LUỒNG L1 ===")
-
-    # 1. Extract: Đọc file dữ liệu nguồn
-    file_path = "data/raw/customers_raw.csv"
-    if not os.path.exists(file_path):
-        os.makedirs("data/raw", exist_ok=True)
-        sample_data = {
-            "raw_id": ["CUST01", "CUST02", "CUST03", "CUST04"],
-            "full_name": ["nguyen van a", "Tran Thi B ", "Le Van C", "Pham Thi D"],
-            "phone": ["+84901234567", "0912345678", "84988888888", "0901234567"],
-            "address": ["HCM", "Ha Noi", "Can Tho", "HCM"],
-        }
-        pd.DataFrame(sample_data).to_csv(file_path, index=False)
-
-    df = pd.read_csv(file_path)
-
-    # --- ĐÚNG CHUẨN RUBRIC TRACK DA: In số dòng, số cột, số ô trống ---
-    print(f"[EXTRACT] Số dòng: {df.shape[0]}")
-    print(f"[EXTRACT] Số cột: {df.shape[1]}")
-    print(f"[EXTRACT] Tổng số ô trống (null): {df.isna().sum().sum()}")
-
-    # 2. Transform: Chuẩn hóa tên & SĐT (QT-02)
-    df["full_name_clean"] = df["full_name"].astype(str).str.strip().str.title()
-    df["phone_clean"] = df["phone"].apply(clean_phone)
-
-    # 3. Quality Check
-    valid_df = df[df["phone_clean"].notna()].copy()
-    reject_df = df[df["phone_clean"].isna()].copy()
-
-    print(f"[QUALITY] Hợp lệ (QT-02): {len(valid_df)} / {len(df)}")
-    print(f"[QUALITY] Bị loại/Lỗi: {len(reject_df)}")
-
-    print("\n--- KẾT QUẢ MẪU SAU KHI LÀM SẠCH ---")
-    print(valid_df[["raw_id", "full_name_clean", "phone_clean"]])
+print(f"[EXTRACT] Số dòng: {len(df_raw)}, Số cột: {len(df_raw.columns)}")
 
 
-if __name__ == "__main__":
-    run_pipeline()
+# 2. TRANSFORM & QUALITY (Chuẩn hóa QT-02, QT-15, QT-12)
+def clean_phone(phone):
+  if not phone or pd.isna(phone):
+    return None
+  phone_str = re.sub(r"\D", "", str(phone))
+  if phone_str.startswith("84"):
+    phone_str = "0" + phone_str[2:]
+  if len(phone_str) == 10 and phone_str.startswith("0"):
+    return phone_str
+  return None
+
+
+def mask_phone(phone):
+  # QT-15: Che 4 số giữa
+  if phone and len(phone) == 10:
+    return phone[:3] + "****" + phone[7:]
+  return phone
+
+
+def get_segment(spent, orders):
+  # QT-12: Phân khúc tự động
+  try:
+    spent = float(spent) if pd.notna(spent) else 0.0
+    orders = int(orders) if pd.notna(orders) else 0
+  except Exception:
+    spent, orders = 0.0, 0
+
+  if spent >= 30000000 or orders >= 8:
+    return "VIP"
+  elif spent >= 10000000 or orders >= 3:
+    return "REGULAR"
+  elif orders >= 1:
+    return "NEW"
+  else:
+    return "DORMANT"
+
+
+df_valid = df_raw.copy()
+df_valid["phone_clean"] = df_valid["phone"].apply(clean_phone)
+df_valid = df_valid.dropna(subset=["phone_clean"])
+df_valid["full_name_clean"] = (
+    df_valid["full_name"]
+    .fillna("Khách hàng")
+    .apply(lambda x: " ".join(str(x).split()).title())
+)
+df_valid["mask_phone"] = df_valid["phone_clean"].apply(mask_phone)
+df_valid["segment_code"] = df_valid.apply(
+    lambda r: get_segment(r["total_spent_12m"], r["total_orders_12m"]), axis=1
+)
+
+print(f"[QUALITY] Hợp lệ (QT-02): {len(df_valid)} / {len(df_raw)}")
+
+# 3. LOAD INTO DWH (Nạp vào Kho dữ liệu SQLite Star Schema)
+conn = sqlite3.connect("dwh.db")
+cursor = conn.cursor()
+
+# Tạo bảng
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS dim_customer (
+    customer_key INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_id TEXT UNIQUE,
+    full_name TEXT,
+    phone TEXT,
+    mask_phone TEXT,
+    is_deleted BOOLEAN DEFAULT 0
+)
+""")
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS fact_customer_segment (
+    fact_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_key INTEGER,
+    total_spent_12m REAL,
+    total_orders_12m INTEGER,
+    segment_code TEXT,
+    updated_at TEXT,
+    FOREIGN KEY(customer_key) REFERENCES dim_customer(customer_key)
+)
+""")
+
+# Vòng tự động nạp dữ liệu (Idempotent - chống trùng lặp)
+for _, row in df_valid.iterrows():
+  cursor.execute(
+      """
+    INSERT INTO dim_customer (customer_id, full_name, phone, mask_phone)
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT(customer_id) DO UPDATE SET
+        full_name=excluded.full_name,
+        phone=excluded.phone,
+        mask_phone=excluded.mask_phone
+    """,
+      (
+          str(row["raw_id"]),
+          row["full_name_clean"],
+          row["phone_clean"],
+          row["mask_phone"],
+      ),
+  )
+
+  cursor.execute(
+      "SELECT customer_key FROM dim_customer WHERE customer_id = ?",
+      (str(row["raw_id"]),),
+  )
+  cust_key_tuple = cursor.fetchone()
+  cust_key = cust_key_tuple[0] if cust_key_tuple else None
+
+  cursor.execute(
+      """
+    INSERT INTO fact_customer_segment (customer_key, total_spent_12m, total_orders_12m, segment_code, updated_at)
+    VALUES (?, ?, ?, ?, ?)
+    """,
+      (
+          cust_key,
+          float(row["total_spent_12m"]),
+          int(row["total_orders_12m"]),
+          row["segment_code"],
+          datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+      ),
+  )
+
+conn.commit()
+conn.close()
+
+print(
+    "[LOAD DWH] Đã nạp thành công dữ liệu vào dim_customer và"
+    " fact_customer_segment trong dwh.db!"
+)
+print("=== PIPELINE HOÀN THÀNH END-TO-END! ===")

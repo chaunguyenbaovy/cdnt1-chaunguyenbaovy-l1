@@ -20,16 +20,11 @@ Quản lý cửa hàng có thể theo dõi số lượng và danh sách khách h
 - SQLAlchemy
 - psycopg2-binary
 - Biến môi trường: xem `.env.example`
-## 3. Hướng dẫn chạy
-1. Tạo và kích hoạt môi trường Python, sau đó cài các thư viện cần thiết:
-   `pip install -r requirements.txt`
-
-2. Cấu hình các biến môi trường trong file `.env` dựa trên `.env.example`.
-
-3. Chạy Jupyter Notebook để thực hiện khám phá và xử lý dữ liệu:
-   `jupyter notebook`
-
-4. Thực hiện quy trình tính toán và gán phân khúc khách hàng theo các notebook/script trong dự án.
+## 3. Hướng dẫn chạy hệ thống End-to-End
+1. Kích hoạt môi trường ảo: `venv\Scripts\activate\`
+2. Chạy Pipeline ETL &amp; Nạp Kho dữ liệu DWH: 'python pipeline.py`
+3. Chạy kiểm thử Unit Tests: `pytest`
+4. Mở Giao diện Dashboard: `streamlit run app.py`
 ## 4. Cấu trúc thư mục
 - `docs/`: Tài liệu mô tả bài toán và dự án.
 - `data/raw/`: Dữ liệu nguồn ban đầu, không commit dữ liệu lớn.
