@@ -1,55 +1,81 @@
-# <Tên phạm vi bằng một câu>
-Sinh viên:
-Châu Nguyễn Bảo Vy - 2374802010578 - Track DA
-Học phần:
-Chuyên đề Tốt nghiệp 1, HK1 2026-2027
-Luồng nghiệp vụ:
-L1 – Hồ sơ khách hàng & Phân khúc
-## 1. Mục tiêu
-Hệ thống hỗ trợ phân tích dữ liệu khách hàng và tính toán, gán phân khúc khách hàng theo các quy tắc đã xác định. 
-Bài toán tập trung vào việc sử dụng dữ liệu mua hàng để tính các chỉ số như tổng giá trị mua hàng, tần suất mua hàng và thời gian từ lần mua gần nhất.
-Kết quả giúp nhân viên bán hàng và marketing biết khách hàng thuộc nhóm nào để phục vụ và chăm sóc phù hợp.
-Quản lý cửa hàng có thể theo dõi số lượng và danh sách khách hàng theo từng phân khúc.
+# Smart CRM Mekong Mobile - Luồng L1 (Hồ sơ Khách hàng & Phân khúc)
+
+**Thông tin sinh viên:**
+- **Họ và tên:** Châu Nguyễn Bảo Vy
+- **MSSV:** 2374802010578
+- **Lớp:** 71K29CNTT07
+- **Track kỹ năng:** Data Analytics (DA)
+- **Học phần:** Chuyên đề Tốt nghiệp 1 (HK1 2026-2027)
+- **Luồng nghiệp vụ:** Luồng L1 - Hồ sơ khách hàng & Phân khúc (Mekong Mobile)
+- **Phiên bản:** Bài tập 2 (Tag Release `v0.2`)
+- **GitHub Repository:** https://github.com/chaunguyenbaovy/cdnt1-chaunguyenbaovy-l1
+
+---
+
+## 1. Mục tiêu hệ thống
+Hệ thống Prototype Smart CRM hỗ trợ quản lý hồ sơ khách hàng cho chuỗi bán lẻ Mekong Mobile. Module tập trung xử lý các bài toán cốt lõi:
+- **Xử lý trùng lặp (V1):** Chuẩn hóa SĐT (QT-02) và gộp trùng dữ liệu khách hàng theo SĐT bằng cơ chế UPSERT (`ON CONFLICT`).
+- **Phân khúc khách hàng (V5):** Tự động tính tổng chi tiêu 12 tháng, tổng đơn hàng 12 tháng và gán nhãn phân khúc (VIP, REGULAR, NEW, DORMANT) theo quy tắc QT-12.
+- **Bảo mật dữ liệu (QT-15):** Che 4 số giữa SĐT (`090****567`) trên giao diện báo cáo và tệp CSV xuất ra.
+
+---
+
 ## 2. Yêu cầu môi trường
-- Python 3.11+
-- PostgreSQL 16
-- Pandas
-- NumPy
-- Matplotlib
-- Jupyter
-- SQLAlchemy
-- psycopg2-binary
-- Biến môi trường: xem `.env.example`
-## 3. Hướng dẫn chạy hệ thống End-to-End
-1. Kích hoạt môi trường ảo: `venv\Scripts\activate\`
-2. Chạy Pipeline ETL &amp; Nạp Kho dữ liệu DWH: 'python pipeline.py`
-3. Chạy kiểm thử Unit Tests: `pytest`
-4. Mở Giao diện Dashboard: `streamlit run app.py`
-## 4. Cấu trúc thư mục
-- `docs/`: Tài liệu mô tả bài toán và dự án.
-- `data/raw/`: Dữ liệu nguồn ban đầu, không commit dữ liệu lớn.
-- `data/processed/`: Dữ liệu sau khi xử lý.
-- `data/sample/`: Dữ liệu mẫu nhỏ dùng để kiểm thử.
-- `notebooks/`: Notebook dùng để khám phá và phân tích dữ liệu.
-- `src/etl/`: Các chương trình Extract, Transform và Load dữ liệu.
-- `dashboard/`: Thành phần hiển thị kết quả phân tích.
-- `requirements.txt`: Danh sách thư viện Python cần cài đặt.
-- `.env.example`: Mẫu các biến môi trường.
-- `.gitignore`: Các file/thư mục không đưa lên Git.
-## 5. Kiểm thử
-Kiểm tra môi trường và trạng thái dự án bằng các lệnh Python/Git.
+- Python 3.10+
+- Môi trường ảo Python (`venv`)
+- Các thư viện phụ thuộc: `pandas`, `sqlite3`, `pytest`, `streamlit`
 
-- Kiểm tra Python:
-  `python --version`
+---
 
-- Kiểm tra Pandas:
-  `python -c "import pandas; print(pandas.__version__)"`
+## 3. Hướng dẫn chạy hệ thống End-to-End (Runbook)
 
-- Kiểm tra Git:
-  `git status`
+Thực hiện lần lượt 4 lệnh sau tại thư mục gốc của dự án:
 
-- Đảm bảo `venv/`, `.env` và dữ liệu nguồn lớn không xuất hiện trong Git.
+```powershell
+# Bước 1: Kích hoạt môi trường ảo
+venv\Scripts\activate
+
+# Bước 2: Chạy Pipeline ETL & Nạp Kho dữ liệu DWH
+python pipeline.py
+
+# Bước 3: Chạy bộ kiểm thử tự động (Unit Tests)
+pytest
+
+# Bước 4: Mở giao diện Dashboard Streamlit
+streamlit run app.py
+```
+
+---
+
+## 4. Cấu trúc thư mục dự án
+```text
+cdnt1-chaunguyenbaovy-l1/
+├── data/
+│   └── raw/
+│       └── customers_raw.csv        # Dữ liệu khách hàng thô ban đầu
+├── docs/
+│   ├── thay-doi-thiet-ke.md        # Nhật ký điều chỉnh thiết kế
+│   └── ai-disclosure.md            # Bảng khai báo công cụ AI
+├── tests/
+│   └── test_pipeline.py            # Bộ 5 Unit Test Cases (Pytest)
+├── app.py                          # Giao diện Dashboard Streamlit
+├── dwh.db                          # CSDL Kho dữ liệu SQLite (Star Schema)
+├── pipeline.py                     # Script Pipeline ETL & Nạp DWH
+└── README.md                       # Tài liệu hướng dẫn chạy hệ thống
+```
+
+---
+
+## 5. Quy tắc nghiệp vụ (Business Rules)
+
+| Mã quy tắc | Tên quy tắc | Mô tả xử lý |
+| :--- | :--- | :--- |
+| **QT-02** | Chuẩn hóa SĐT | Loại bỏ ký tự đặc biệt, chuyển `+84` / `84` thành `0`, đảm bảo đúng 10 số. |
+| **QT-12** | Phân khúc KH | Tính tổng chi tiêu và số đơn hàng 12 tháng gần nhất để gán nhãn: `VIP`, `REGULAR`, `NEW`, `DORMANT`. |
+| **QT-15** | Bảo mật SĐT | Che 4 chữ số giữa: `090****567` (giữ 3 số đầu và 3 số cuối) khi hiển thị và xuất file. |
+
+---
+
 ## 6. Trạng thái hiện tại
- Khởi tạo project, smoke test chạy được (buổi 2)
-□ Module tiếp nhận yêu cầu (buổi 8–10)
-□ Module phân công kỹ thuật viên (buổi 10–12)
+- [x] **Sprint 1 (Buổi 8):** Xây dựng Module cốt lõi ETL, làm sạch dữ liệu SĐT (QT-02).
+- [x] **Sprint 2 (Buổi 10 – 12):** Nạp Kho dữ liệu Star Schema (`dwh.db`), hoàn thành bộ 5 Unit Test Pytest (`5 passed`), xây dựng Dashboard Streamlit (`app.py`) và tạo Tag Release `v0.2` nộp Bài tập 2.
