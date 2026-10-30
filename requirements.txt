@@ -1,0 +1,3 @@
+﻿pandas&gt;=2.0.0\
+streamlit&gt;=1.28.0\
+pytest&gt;=7.4.0
